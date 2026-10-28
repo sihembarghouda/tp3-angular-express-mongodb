@@ -1,0 +1,25 @@
+
+services:
+  mongo:
+    image: mongo:8
+    container_name: appareils-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  api:
+    build: ./api
+    container_name: appareils-api
+    restart: unless-stopped
+    ports:
+      - "3002:3001"
+    environment:
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/appareilsDB
+    depends_on:
+      - mongo
+
+volumes:
+  mongodata:

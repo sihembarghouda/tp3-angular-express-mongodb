@@ -1,0 +1,155 @@
+
+<div class="container py-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <h1 class="fw-bold mb-2">Gestion des appareils</h1>
+      <p class="text-secondary mb-0">
+        Consultez et gérez vos appareils connectés.
+      </p>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" (click)="ouvrirFormulaire()">
+        <i class="bi bi-plus-circle me-2"></i> Ajouter un appareil
+      </button>
+
+      <button class="btn btn-outline-primary" (click)="changerTousLesStatuts()">
+        <i class="bi bi-power me-2"></i> Inverser les statuts
+      </button>
+    </div>
+  </div>
+
+  @if (messageSucces) {
+    <div class="alert alert-success">{{ messageSucces }}</div>
+  }
+
+  @if (erreur) {
+    <div class="alert alert-danger">{{ erreur }}</div>
+  }
+
+  @if (afficherFormulaire) {
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+      <div class="card-body p-4">
+        <h4 class="fw-bold mb-4">
+  {{ modeModification ? 'Modifier un appareil' : 'Ajouter un appareil' }}
+</h4>
+
+       <form (ngSubmit)="enregistrerAppareil()" #formAppareil="ngForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="nom" class="form-label">Nom *</label>
+              <input id="nom" name="nom" class="form-control"
+                [(ngModel)]="$any(nouvelAppareil).nom" required minlength="2">
+            </div>
+
+            <div class="col-md-6">
+              <label for="marque" class="form-label">Marque *</label>
+              <input id="marque" name="marque" class="form-control"
+                [(ngModel)]="$any(nouvelAppareil).marque" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="categorie" class="form-label">Catégorie *</label>
+              <input id="categorie" name="categorie" class="form-control"
+                [(ngModel)]="$any(nouvelAppareil).categorie" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="prix" class="form-label">Prix (DT) *</label>
+              <input id="prix" name="prix" type="number" min="0" step="0.01"
+                class="form-control" [(ngModel)]="$any(nouvelAppareil).prix" required>
+            </div>
+
+            <div class="col-12">
+              <label for="description" class="form-label">Description</label>
+              <textarea id="description" name="description" rows="3"
+                class="form-control"
+                [(ngModel)]="$any(nouvelAppareil).description"></textarea>
+            </div>
+
+            <div class="col-md-6">
+              <label for="statut" class="form-label">Statut</label>
+              <select id="statut" name="statut" class="form-select"
+                [(ngModel)]="$any(nouvelAppareil).statut">
+                <option value="Off">Éteint (Off)</option>
+                <option value="On">Allumé (On)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary"
+              [disabled]="formAppareil.invalid || enregistrement">
+              @if (enregistrement) {
+                Enregistrement...
+              } @else {
+                Enregistrer
+              }
+            </button>
+
+            <button type="button" class="btn btn-outline-secondary"
+              (click)="annulerAjout()">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (chargement) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-3 text-secondary">Chargement des appareils...</p>
+    </div>
+  } @else if (appareils.length === 0) {
+    <div class="alert alert-info">Aucun appareil trouvé.</div>
+  } @else {
+    <div class="row g-4">
+      @for (appareil of appareils; track appareil) {
+        <div class="col-12 col-md-6 col-xl-4">
+          <div class="card h-100 shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="icon-appareil">
+                  <i class="bi bi-plug-fill"></i>
+                </div>
+                <span class="badge rounded-pill"
+                  [class.text-bg-success]="$any(appareil).statut === 'On'"
+                  [class.text-bg-secondary]="$any(appareil).statut === 'Off'">
+                  {{ $any(appareil).statut }}
+                </span>
+              </div>
+
+              <h5 class="card-title fw-bold">{{ $any(appareil).nom }}</h5>
+              <p class="text-secondary mb-2">
+                <i class="bi bi-tag me-2"></i>{{ $any(appareil).marque }}
+              </p>
+              <p class="text-secondary mb-3">
+                <i class="bi bi-grid me-2"></i>{{ $any(appareil).categorie }}
+              </p>
+              <p class="small text-secondary">
+                {{ $any(appareil).description || 'Aucune description disponible.' }}
+              </p>
+
+              <div class="d-flex justify-content-between align-items-center mt-4">
+                <span class="fs-4 fw-bold text-primary">
+                  {{ $any(appareil).prix }} DT
+                </span>
+                <button
+  class="btn btn-outline-primary btn-sm me-2"
+  (click)="modifierAppareil(appareil)">
+  <i class="bi bi-pencil me-1"></i> Modifier
+</button>
+                <button class="btn btn-outline-danger btn-sm"
+                  (click)="supprimerAppareil($any(appareil).id)">
+                  <i class="bi bi-trash me-1"></i> Supprimer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
